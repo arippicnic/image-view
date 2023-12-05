@@ -1,22 +1,25 @@
 "use client";
-<img src="/img_webstore-banner-6.webp" alt="image webp webstore banner axis" />;
+
 import { useState, useEffect, useCallback, useRef, ChangeEvent } from "react";
 import imageCompression from "browser-image-compression";
 import { useDropzone } from "react-dropzone";
-import { IoCopyOutline } from "react-icons/io5";
+import JSZip from "jszip";
 import ReactCrop, { type Crop, PixelCrop } from "react-image-crop";
+
 import { FaCheck } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
-import { niceBytes } from "./helper/niceBytes";
-import { makeTitle } from "./helper/makeTitle";
 import { RiDeleteBin7Line } from "react-icons/ri";
+import { IoCopyOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
+
+import { niceBytes } from "./helper/niceBytes";
+import { makeTitle } from "./helper/makeTitle";
 import { removeTransparentPixelsFromFile } from "./helper/removeTransparentPixelsFromFile";
 import { canvasPreview } from "./helper/canvasPreview";
-import JSZip from "jszip";
 import { imageType } from "./helper/imageType";
+
 export default function Home() {
   const [imageURLS, setImageURLs] = useState<Array<any>>([]);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<any>>([]);
@@ -35,6 +38,26 @@ export default function Home() {
     nameApp: "axis",
     namePage: "paket-suka-suka",
   });
+
+  async function handleCompletedCrop(pixelCrop: PixelCrop, id: number) {
+    const image = imgRef.current;
+    if (!image || pixelCrop.width === 0) {
+      return;
+    }
+    const canvas = document.createElement("canvas");
+    canvasPreview(image, canvas, pixelCrop, 1, 0);
+
+    return new Promise(() => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const img = URL.createObjectURL(blob);
+          const size = niceBytes(blob.size);
+          const newProjects = imageURLS.map((p) => (p.id === id ? { ...p, img, size } : p));
+          setImageURLsCrop(newProjects);
+        }
+      }, `image/${option.fileType}`);
+    });
+  }
 
   const handleDownload = (event: any) => {
     event.forEach((value: any, idx: number) => {
@@ -65,6 +88,7 @@ export default function Home() {
       }, idx * 100);
     });
   };
+
   async function compression(event: File, length: number, completedCount: number) {
     const options = {
       maxSizeMB: option.fileMaxSize,
@@ -87,6 +111,7 @@ export default function Home() {
   }
 
   const onImageChange = useCallback(async (acceptedFiles: any) => {
+    setImageURLs([]);
     const newImageUrls: any = [];
     const extractedFiles = acceptedFiles.filter((el: any) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: any) => el.type === "application/zip");
@@ -94,7 +119,6 @@ export default function Home() {
     let completedCount = 0;
     let index = 1;
 
-    // console.log(newFiles);
     if (extractedFilesZip.length !== 0) {
       for (const image of extractedFilesZip) {
         const zip = new JSZip();
@@ -118,7 +142,6 @@ export default function Home() {
     for (const image of newFiles) {
       index++;
       const fileImages: any = await compression(image, newFiles.length, completedCount);
-      console.log(image);
       const img = URL.createObjectURL(fileImages);
 
       completedCount = 100 / newFiles.length + completedCount;
@@ -131,6 +154,7 @@ export default function Home() {
       }" />`;
       newImageUrls.push({ id: index, img, size, name, name_full, codeImg });
     }
+
     setImageURLs(newImageUrls);
   }, []);
 
@@ -141,26 +165,6 @@ export default function Home() {
       "application/zip": [],
     },
   });
-
-  async function handleCompletedCrop(pixelCrop: PixelCrop, id: number) {
-    const image = imgRef.current;
-    if (!image || pixelCrop.width === 0) {
-      return;
-    }
-    const canvas = document.createElement("canvas");
-    canvasPreview(image, canvas, pixelCrop, 1, 0);
-
-    return new Promise(() => {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const img = URL.createObjectURL(blob);
-          const size = niceBytes(blob.size);
-          const newProjects = imageURLS.map((p) => (p.id === id ? { ...p, img, size } : p));
-          setImageURLsCrop(newProjects);
-        }
-      }, `image/${option.fileType}`);
-    });
-  }
 
   return (
     <>
@@ -199,15 +203,18 @@ export default function Home() {
           <input {...getInputProps()} />
           {isDragActive ? <p>Drop</p> : <p>Drag or click</p>}
         </div>
-        {pecentOF !== 0 && pecentOF !== 100 && <h2 className="mt-4">{pecentOF}%</h2>}
-        {pecentOF === 100 && imageURLS.length !== 0 && (
+        {pecentOF !== 0 && ![99, 100].includes(pecentOF) && <h2 className="mt-4">{pecentOF}%</h2>}
+        {[99, 100].includes(pecentOF) && imageURLS.length !== 0 && (
           <>
-            <button
-              onClick={() => handleDownload(imageURLS)}
-              className="my-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Donwload All
-            </button>
+            <div className="flex my-4">
+              <button onClick={() => handleDownload(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">
+                Donwload All
+              </button>
+              <button onClick={() => setImageURLs([])} className="ml-2 bg-red-500 text-white font-bold py-2 px-4 rounded">
+                Delete All
+              </button>
+            </div>
+
             {imageURLS.map((items, i) => (
               <div className="grid grid-cols-2 gap-2 mb-2" key={i}>
                 <div className="border h-[fit-content] border-white bg-white">
