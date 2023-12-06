@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, ChangeEvent } from "react";
+import { useState, useRef } from "react";
 import imageCompression from "browser-image-compression";
 import { useDropzone } from "react-dropzone";
 import JSZip from "jszip";
@@ -13,30 +13,36 @@ import { IoCopyOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
+import { FaGear } from "react-icons/fa6";
 
 import { niceBytes } from "./helper/niceBytes";
-import { makeTitle } from "./helper/makeTitle";
 import { removeTransparentPixelsFromFile } from "./helper/removeTransparentPixelsFromFile";
 import { canvasPreview } from "./helper/canvasPreview";
 import { imageType } from "./helper/imageType";
+import ModalForm from "./components/modalForm";
+import { TypeFormData } from "./types";
+import { stringToSlug } from "./helper/stringToSlug";
+import { replaceSpecialString } from "./helper/replaceSpecialString";
 
 export default function Home() {
   const [imageURLS, setImageURLs] = useState<Array<any>>([]);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<any>>([]);
   const [pecentOF, setpecentOF] = useState(0);
   const [copyCode, setCopyCode] = useState(0);
+  const [optionModal, setOptionModal] = useState(false);
   const [donwloadImage, setDonwloadImage] = useState(0);
   const [imageView, setImageView] = useState<string | null>(null);
   const [imageViewCrop, setImageCrop] = useState<{ url: string; id: number } | null>(null);
   const [crop, setCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const [option, setOption] = useState({
+  const [option, setOption] = useState<TypeFormData>({
     nameStart: 1,
     fileType: "webp",
     fileMaxSize: 0.2,
-    nameApp: "axis",
-    namePage: "paket-suka-suka",
+    nameApp: "name",
+    namePage: "page",
+    codeOuput: `<img src="/{name}" {alt} />`,
   });
 
   async function handleCompletedCrop(pixelCrop: PixelCrop, id: number) {
@@ -110,9 +116,8 @@ export default function Home() {
     }
   }
 
-  const onImageChange = useCallback(async (acceptedFiles: any) => {
-    setImageURLs([]);
-    const newImageUrls: any = [];
+  const onImageChange = (w: any) => async (acceptedFiles: any) => {
+    const newImageUrls: any = w;
     const extractedFiles = acceptedFiles.filter((el: any) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: any) => el.type === "application/zip");
     const newFiles: File[] = [...extractedFiles];
@@ -142,24 +147,26 @@ export default function Home() {
     for (const image of newFiles) {
       index++;
       const fileImages: any = await compression(image, newFiles.length, completedCount);
+
       const img = URL.createObjectURL(fileImages);
-
-      completedCount = 100 / newFiles.length + completedCount;
+      const id = index + new Date().valueOf();
       const size = niceBytes(fileImages.size);
-
       const name = index - 1;
-      const name_full = `img_${option.namePage}-${name}.${option.fileType}`;
-      const codeImg = `<img src="/${name_full}" alt="image ${option.fileType} ${makeTitle(option.namePage)} ${
-        option.nameApp
-      }" />`;
-      newImageUrls.push({ id: index, img, size, name, name_full, codeImg });
+      const name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
+      const alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+      const replacements = { "{name}": name_full, "{alt}": alt };
+
+      const codeImg = replaceSpecialString(option.codeOuput, replacements);
+
+      newImageUrls.push({ id, img, size, name, name_full, codeImg });
+      completedCount = 100 / newFiles.length + completedCount;
     }
 
     setImageURLs(newImageUrls);
-  }, []);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: onImageChange,
+    onDrop: onImageChange([...imageURLS]),
     accept: {
       "image/*": [],
       "application/zip": [],
@@ -168,6 +175,7 @@ export default function Home() {
 
   return (
     <>
+      <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
       {imageView && (
         <div className="img-view-box">
           <img src={imageView} />
@@ -196,6 +204,10 @@ export default function Home() {
       )}
 
       <main className="flex justify-center flex-col items-center">
+        <div className="my-4 cursor-pointer" onClick={() => setOptionModal(true)}>
+          <FaGear color="white" className="icon" />
+        </div>
+        <div></div>
         <div
           {...getRootProps()}
           className="text-center bg-white h-[100px] w-[200px] text-[black] flex p-8 items-center justify-center"
@@ -207,10 +219,10 @@ export default function Home() {
         {[99, 100].includes(pecentOF) && imageURLS.length !== 0 && (
           <>
             <div className="flex my-4">
-              <button onClick={() => handleDownload(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">
+              <button onClick={() => handleDownload(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4">
                 Donwload All
               </button>
-              <button onClick={() => setImageURLs([])} className="ml-2 bg-red-500 text-white font-bold py-2 px-4 rounded">
+              <button onClick={() => setImageURLs([])} className="ml-2 bg-red-500 text-white font-bold py-2 px-4">
                 Delete All
               </button>
             </div>
