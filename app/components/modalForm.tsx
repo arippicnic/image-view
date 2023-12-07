@@ -52,7 +52,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
             value={formData[item.name as keyof TypeFormData] as string}
             className="text-gray-900 p-2 w-full"
           >
-            {["png", "webp", "jpg", "svg"].map((select, i) => (
+            {["png", "webp", "jpg"].map((select, i) => (
               <option key={i} value={select}>
                 {select}
               </option>
