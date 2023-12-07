@@ -99,7 +99,7 @@ export default function Home() {
     const options = {
       maxSizeMB: option.fileMaxSize,
       alwaysKeepResolution: true,
-      fileType: `image/${option.fileType}`,
+      fileType: `image/webp`,
       onProgress: (i: number) => {
         const progressPercent = i / length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
@@ -207,7 +207,6 @@ export default function Home() {
         <div className="my-4 cursor-pointer" onClick={() => setOptionModal(true)}>
           <FaGear color="white" className="icon" />
         </div>
-        <div></div>
         <div
           {...getRootProps()}
           className="text-center bg-white h-[100px] w-[200px] text-[black] flex p-8 items-center justify-center"
