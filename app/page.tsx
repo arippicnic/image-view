@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import imageCompression from "browser-image-compression";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileRejection } from "react-dropzone";
 import JSZip from "jszip";
 import ReactCrop, { type Crop, PixelCrop } from "react-image-crop";
 
@@ -20,13 +20,13 @@ import { removeTransparentPixelsFromFile } from "./helper/removeTransparentPixel
 import { canvasPreview } from "./helper/canvasPreview";
 import { imageType } from "./helper/imageType";
 import ModalForm from "./components/modalForm";
-import { TypeFormData } from "./types";
+import { TypeFormData, TypeImageURLS } from "./types";
 import { stringToSlug } from "./helper/stringToSlug";
 import { replaceSpecialString } from "./helper/replaceSpecialString";
 
 export default function Home() {
-  const [imageURLS, setImageURLs] = useState<Array<any>>([]);
-  const [imageURLSCrop, setImageURLsCrop] = useState<Array<any>>([]);
+  const [imageURLS, setImageURLs] = useState<Array<TypeImageURLS>>([]);
+  const [imageURLSCrop, setImageURLsCrop] = useState<Array<TypeImageURLS>>([]);
   const [pecentOF, setpecentOF] = useState(0);
   const [copyCode, setCopyCode] = useState(0);
   const [optionModal, setOptionModal] = useState(false);
@@ -65,8 +65,9 @@ export default function Home() {
     });
   }
 
-  const handleDownload = (event: any) => {
-    event.forEach((value: any, idx: number) => {
+  const handleDownload = (event: TypeImageURLS[]) => {
+    console.log(event);
+    event.forEach((value: TypeImageURLS, idx: number) => {
       setTimeout(() => {
         fetch(value.img, {
           method: "GET",
@@ -116,10 +117,10 @@ export default function Home() {
     }
   }
 
-  const onImageChange = (w: any) => async (acceptedFiles: any) => {
-    const newImageUrls: any = w;
-    const extractedFiles = acceptedFiles.filter((el: any) => el.type !== "application/zip");
-    const extractedFilesZip = acceptedFiles.filter((el: any) => el.type === "application/zip");
+  const onImageChange = (file: TypeImageURLS[]) => async (acceptedFiles: File[]) => {
+    const newImageUrls: TypeImageURLS[] = file;
+    const extractedFiles = acceptedFiles.filter((el: { type: string }) => el.type !== "application/zip");
+    const extractedFilesZip = acceptedFiles.filter((el: { type: string }) => el.type === "application/zip");
     const newFiles: File[] = [...extractedFiles];
     let completedCount = 0;
     let index = 1;
@@ -146,22 +147,22 @@ export default function Home() {
 
     for (const image of newFiles) {
       index++;
-      const fileImages: any = await compression(image, newFiles.length, completedCount);
+      const fileImages: Blob | undefined = await compression(image, newFiles.length, completedCount);
+      if (fileImages) {
+        const img = URL.createObjectURL(fileImages);
+        const id = index + new Date().valueOf();
+        const size = niceBytes(fileImages.size);
+        const name = index - 1;
+        const name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
+        const alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+        const replacements = { "{name}": name_full, "{alt}": alt };
 
-      const img = URL.createObjectURL(fileImages);
-      const id = index + new Date().valueOf();
-      const size = niceBytes(fileImages.size);
-      const name = index - 1;
-      const name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
-      const alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
-      const replacements = { "{name}": name_full, "{alt}": alt };
+        const codeImg = replaceSpecialString(option.codeOuput, replacements);
 
-      const codeImg = replaceSpecialString(option.codeOuput, replacements);
-
-      newImageUrls.push({ id, img, size, name, name_full, codeImg });
-      completedCount = 100 / newFiles.length + completedCount;
+        newImageUrls.push({ id, img, size, name, name_full, codeImg });
+        completedCount = 100 / newFiles.length + completedCount;
+      }
     }
-
     setImageURLs(newImageUrls);
   };
 
