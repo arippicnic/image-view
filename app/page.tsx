@@ -104,7 +104,7 @@ export default function Home() {
       onProgress: (i: number) => {
         const progressPercent = i / length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
-        if (digitsOnly !== pecentOF) setpecentOF(digitsOnly);
+        setpecentOF(digitsOnly)
       },
     };
 
@@ -145,23 +145,22 @@ export default function Home() {
       }
     }
 
-    for (const image of newFiles) {
-      index++;
+    for (const image of newFiles) {      
       const fileImages: Blob | undefined = await compression(image, newFiles.length, completedCount);
       if (fileImages) {
         const img = URL.createObjectURL(fileImages);
         const id = index + new Date().valueOf();
         const size = niceBytes(fileImages.size);
-        const name = index - 1;
+        const name = Number(option.nameStart) + Number(index) - 1;
         const name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
         const alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
         const replacements = { "{name}": name_full, "{alt}": alt };
-
         const codeImg = replaceSpecialString(option.codeOuput, replacements);
 
         newImageUrls.push({ id, img, size, name, name_full, codeImg });
         completedCount = 100 / newFiles.length + completedCount;
       }
+      index++;
     }
     setImageURLs(newImageUrls);
   };
@@ -173,7 +172,7 @@ export default function Home() {
       "application/zip": [],
     },
   });
-
+  
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
@@ -219,14 +218,13 @@ export default function Home() {
         {[99, 100].includes(pecentOF) && imageURLS.length !== 0 && (
           <>
             <div className="flex my-4">
-              <button onClick={() => handleDownload(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4">
-                Donwload All
-              </button>
-              <button onClick={() => setImageURLs([])} className="ml-2 bg-red-500 text-white font-bold py-2 px-4">
+            <button onClick={() => setImageURLs([])} className="mr-2 bg-red-500 text-white font-bold py-2 px-4">
                 Delete All
               </button>
+              <button onClick={() => handleDownload(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4">
+                Donwload All
+              </button>   
             </div>
-
             {imageURLS.map((items, i) => (
               <div className="grid grid-cols-2 gap-2 mb-2" key={i}>
                 <div className="border h-[fit-content] border-white bg-white">
