@@ -42,6 +42,7 @@ export default function Home() {
   });
 
   const onImageChange = (file: TypeImageURLS[]) => async (acceptedFiles: File[]) => {
+    //test build
     const newImageUrls: TypeImageURLS[] = file;
     const extractedFiles = acceptedFiles.filter((el: { type: string }) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: { type: string }) => el.type === "application/zip");
