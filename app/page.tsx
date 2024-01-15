@@ -102,7 +102,7 @@ export default function Home() {
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
-      {/* <CropImage option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} /> */}
+      <CropImage option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} />
       {imageView && (
         <div className="img-view-box">
           <img src={imageView} />
