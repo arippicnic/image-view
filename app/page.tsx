@@ -20,7 +20,7 @@ import { TypeFormData, TypeImageURLS } from "./types";
 import { stringToSlug } from "./helper/stringToSlug";
 import { replaceSpecialString } from "./helper/replaceSpecialString";
 import { downloadMulti } from "./helper/donwloadMulti";
-import CropImage from "./components/cropImage";
+// import CropImage from "./components/cropImage";
 import { compression } from "./helper/compress";
 
 export default function Home() {
@@ -101,7 +101,7 @@ export default function Home() {
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
-      <CropImage option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} />
+      {/* <CropImage option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} /> */}
       {imageView && (
         <div className="img-view-box">
           <img src={imageView} />
