@@ -64,4 +64,4 @@ const CropImagesCom: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop 
   );
 };
 
-export default memo(CropImagesCom);
+export default CropImagesCom;
