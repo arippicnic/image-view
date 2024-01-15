@@ -14,7 +14,7 @@ interface TypeCom {
   setImageCrop: Dispatch<SetStateAction<{ url: string; id: number } | null>>;
 }
 
-const CropImagesCom: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop }) => {
+const CropImageCom: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop }) => {
   const [imageURLS, setImageURLs] = useState<Array<TypeImageURLS>>([]);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<TypeImageURLS>>([]);
   const [crop, setCrop] = useState<Crop>();
@@ -64,4 +64,4 @@ const CropImagesCom: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop 
   );
 };
 
-export default CropImagesCom;
+export default CropImageCom;
