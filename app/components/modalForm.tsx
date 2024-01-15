@@ -11,7 +11,7 @@ interface TypeCom {
   setModal: Dispatch<SetStateAction<boolean>>;
 }
 
-const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) => {
+export default function ModalForm({ option, setOption, modal, setModal }: TypeCom) {
   const [formData, setFormData] = useState<TypeFormData>(option);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -109,6 +109,4 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
       </div>
     </div>
   );
-};
-
-export default ModalForm;
+}
