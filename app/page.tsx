@@ -16,7 +16,7 @@ import { FaGear } from "react-icons/fa6";
 import { niceBytes } from "./helper/niceBytes";
 import { imageType } from "./helper/imageType";
 import ModalForm from "./components/modalForm";
-import CropImage from "./components/cropImage";
+import CropImg from "./components/cropImg";
 import { TypeFormData, TypeImageURLS } from "./types";
 import { stringToSlug } from "./helper/stringToSlug";
 import { replaceSpecialString } from "./helper/replaceSpecialString";
@@ -102,7 +102,7 @@ export default function Home() {
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
-      <CropImage option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} />
+      <CropImg option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} />
       {imageView && (
         <div className="img-view-box">
           <img src={imageView} />
