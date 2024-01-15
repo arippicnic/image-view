@@ -16,11 +16,12 @@ import { FaGear } from "react-icons/fa6";
 import { niceBytes } from "./helper/niceBytes";
 import { imageType } from "./helper/imageType";
 import ModalForm from "./components/modalForm";
+import CropImage from "./components/cropImage";
 import { TypeFormData, TypeImageURLS } from "./types";
 import { stringToSlug } from "./helper/stringToSlug";
 import { replaceSpecialString } from "./helper/replaceSpecialString";
 import { downloadMulti } from "./helper/donwloadMulti";
-// import CropImage from "./components/cropImage";
+
 import { compression } from "./helper/compress";
 
 export default function Home() {
