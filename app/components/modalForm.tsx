@@ -111,4 +111,4 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
   );
 };
 
-export default memo(ModalForm);
+export default ModalForm;
