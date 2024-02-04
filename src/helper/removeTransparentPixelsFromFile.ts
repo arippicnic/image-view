@@ -1,5 +1,7 @@
-export const removeTransparentPixelsFromFile = async (inputFile: File): Promise<File> => {
-  if (!inputFile.type.startsWith("image/png")) {
+import { TypeFormData } from "../types";
+
+export const removeTransparentPixelsFromFile = async (inputFile: File, option: TypeFormData): Promise<File> => {
+  if (!inputFile.type.startsWith("image/png") || option.autoCrop === "no") {
     return inputFile;
   }
   return new Promise<File>((resolve, reject) => {

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { TypeImageURLS, TypeFormData } from "../types";
+import { TypeFormData } from "../types";
 import { removeTransparentPixelsFromFile } from "./removeTransparentPixelsFromFile";
 import imageCompression from "browser-image-compression";
 
@@ -23,7 +23,7 @@ export async function compression(
   };
 
   try {
-    const removeTransparent = await removeTransparentPixelsFromFile(event);
+    const removeTransparent = await removeTransparentPixelsFromFile(event, option);
     const compressedFile = await imageCompression(removeTransparent, options);
     return compressedFile;
   } catch (error) {

@@ -13,16 +13,15 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
 import { FaGear } from "react-icons/fa6";
 
-import { niceBytes } from "./helper/niceBytes";
-import { imageType } from "./helper/imageType";
+import { niceBytes } from "../src/helper/niceBytes";
+import { imageType } from "../src/helper/imageType";
 import ModalForm from "./components/modalForm";
 import CropImg from "./components/cropImg";
-import { TypeFormData, TypeImageURLS } from "./types";
-import { stringToSlug } from "./helper/stringToSlug";
-import { replaceSpecialString } from "./helper/replaceSpecialString";
-import { downloadMulti } from "./helper/donwloadMulti";
-
-import { compression } from "./helper/compress";
+import { TypeFormData, TypeImageURLS } from "../src/types";
+import { stringToSlug } from "../src/helper/stringToSlug";
+import { replaceSpecialString } from "../src/helper/replaceSpecialString";
+import { downloadMulti } from "../src/helper/donwloadMulti";
+import { compression } from "../src/helper/compress";
 
 export default function Home() {
   const [imageURLS, setImageURLs] = useState<Array<TypeImageURLS>>([]);
@@ -40,10 +39,10 @@ export default function Home() {
     nameApp: "name",
     namePage: "page",
     codeOuput: `<img src="/{name}" {alt} />`,
+    autoCrop: "yes",
   });
 
   const onImageChange = (file: TypeImageURLS[]) => async (acceptedFiles: File[]) => {
-    //test build
     const newImageUrls: TypeImageURLS[] = file;
     const extractedFiles = acceptedFiles.filter((el: { type: string }) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: { type: string }) => el.type === "application/zip");
@@ -74,15 +73,21 @@ export default function Home() {
     for (const image of newFiles) {
       const fileImages: Blob | undefined = await compression(image, newFiles.length, completedCount, option, setpecentOF);
       if (fileImages) {
-        const img = URL.createObjectURL(fileImages);
-        const id = index + new Date().valueOf();
-        const size = niceBytes(fileImages.size);
-        const name = Number(option.nameStart) + Number(index) - 1;
-        const name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
-        const alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+        let name = image.name;
+        let name_full = name;
+        let alt = `alt="image ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+
+        if (option.fileType !== "original") {
+          name = (Number(option.nameStart) + Number(index) - 1).toString();
+          name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
+          alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+        }
+
         const replacements = { "{name}": name_full, "{alt}": alt };
         const codeImg = replaceSpecialString(option.codeOuput, replacements);
-
+        const size = niceBytes(fileImages.size);
+        const id = index + new Date().valueOf();
+        const img = URL.createObjectURL(fileImages);
         newImageUrls.push({ id, img, size, name, name_full, codeImg });
         completedCount = 100 / newFiles.length + completedCount;
       }
@@ -102,7 +107,13 @@ export default function Home() {
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
-      <CropImg option={option} imageViewCrop={imageViewCrop} setImageCrop={setImageCrop} />
+      <CropImg
+        option={option}
+        imageViewCrop={imageViewCrop}
+        setImageCrop={setImageCrop}
+        imageURLS={imageURLS}
+        setImageURLs={setImageURLs}
+      />
       {imageView && (
         <div className="img-view-box">
           <img src={imageView} />

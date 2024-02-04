@@ -4,13 +4,14 @@ export type TypeFormData = {
   fileMaxSize: number;
   nameStart: number;
   fileType: string;
+  autoCrop: "yes" | "no";
   codeOuput: string;
 };
 
 export type TypeImageURLS = {
   id: number;
   img: string;
-  name: number;
+  name: string;
   codeImg: string;
   size: string;
   name_full: string;

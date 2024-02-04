@@ -1,8 +1,8 @@
 import React, { useState, ChangeEvent, memo, Dispatch, SetStateAction, useEffect } from "react";
 import { IoIosCloseCircle } from "react-icons/io";
 
-import { setItemLocal, getItemLocal } from "../helper/localStorageManager";
-import { TypeFormData } from "../types";
+import { setItemLocal, getItemLocal } from "../../src/helper/localStorageManager";
+import { TypeFormData } from "../../src/types";
 
 interface TypeCom {
   option: TypeFormData;
@@ -28,12 +28,19 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
 
   const renderField = () => {
     return [
-      { label: "Name", name: "nameApp", type: "text", col: "col-span-3" },
-      { label: "Name Page", name: "namePage", type: "text", col: "col-span-3 w-full" },
-      { label: "Max Size(MB)", name: "fileMaxSize", type: "number", col: "col-span-2 w-full" },
-      { label: "Start Name", name: "nameStart", type: "number", col: "col-span-2 w-full" },
-      { label: "Output Image", name: "fileType", type: "select", col: "col-span-2 w-full" },
-      { label: "Code Image", name: "codeOuput", type: "textArea", col: "col-span-6 w-full" },
+      { label: "Name", name: "nameApp", type: "text", col: "col-span-4" },
+      { label: "Name Page", name: "namePage", type: "text", col: "col-span-4" },
+      { label: "Max Size(MB)", name: "fileMaxSize", type: "number", col: "col-span-2" },
+      { label: "Start Name", name: "nameStart", type: "number", col: "col-span-2" },
+      {
+        label: "Output Image",
+        name: "fileType",
+        type: "select",
+        col: "col-span-2",
+        selectData: ["png", "webp", "jpg", "original"],
+      },
+      { label: "Auto Crop PNG", name: "autoCrop", type: "select", col: "col-span-2", selectData: ["yes", "no"] },
+      { label: "Code Image", name: "codeOuput", type: "textArea", col: "col-span-8" },
     ].map((item, i) => (
       <div key={i} className={`${item.col} w-full`}>
         <label className="block mb-1 text-xs">{item.label}</label>
@@ -52,7 +59,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
             value={formData[item.name as keyof TypeFormData] as string}
             className="text-gray-900 p-2 w-full"
           >
-            {["png", "webp", "jpg"].map((select, i) => (
+            {item.selectData?.map((select, i) => (
               <option key={i} value={select}>
                 {select}
               </option>
@@ -81,33 +88,37 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
   }, []);
 
   return (
-    <div className={`${modal ? "show" : "hidden"} fixed top-0 right-0 left-0 z-50 justify-center max-h-full flex items-start`}>
-      <div className="relative p-4 w-full max-w-3xl max-h-full">
-        <div className="relative dark:bg-gray-700 p-4">
-          <IoIosCloseCircle
-            onClick={() => setModal(false)}
-            color="white"
-            className="cursor-pointer absolute right-[1rem] text-[1.7rem] item "
-          />
-          <form className="text-sm mt-10">
-            <div className="grid grid-cols-6 gap-2 mb-5">{renderField()}</div>
-            <div className="flex justify-end w-full">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOption(formData);
-                  setItemLocal("user_option", formData);
-                  setModal(false);
-                }}
-                className="bg-blue-500 text-white font-bold py-2 px-4"
-              >
-                OK
-              </button>
+    <>
+      {modal && (
+        <div className={`fixed top-0 right-0 left-0 z-50 justify-center max-h-full flex items-start`}>
+          <div className="relative p-4 w-full max-w-3xl max-h-full">
+            <div className="relative dark:bg-gray-700 p-4">
+              <IoIosCloseCircle
+                onClick={() => setModal(false)}
+                color="white"
+                className="cursor-pointer absolute right-[1rem] text-[1.7rem] item "
+              />
+              <form className="text-sm mt-10">
+                <div className="grid grid-cols-8 gap-2 mb-5">{renderField()}</div>
+                <div className="flex justify-end w-full">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOption(formData);
+                      setItemLocal("user_option", formData);
+                      setModal(false);
+                    }}
+                    className="bg-blue-500 text-white font-bold py-2 px-4"
+                  >
+                    OK
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

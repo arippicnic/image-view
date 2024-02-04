@@ -4,23 +4,25 @@ import ReactCrop, { type Crop, PixelCrop } from "react-image-crop";
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
 
-import { niceBytes } from "../helper/niceBytes";
-import { canvasPreview } from "../helper/canvasPreview";
-import { TypeFormData, TypeImageURLS } from "../types";
+import { niceBytes } from "../../src/helper/niceBytes";
+import { canvasPreview } from "../../src//helper/canvasPreview";
+import { TypeFormData, TypeImageURLS } from "../../src/types";
 
 interface TypeCom {
   option: TypeFormData;
   imageViewCrop: { url: string; id: number } | null;
   setImageCrop: Dispatch<SetStateAction<{ url: string; id: number } | null>>;
+  imageURLS: TypeImageURLS[];
+  setImageURLs: Dispatch<SetStateAction<TypeImageURLS[]>>;
 }
 
-const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop }) => {
-  const [imageURLS, setImageURLs] = useState<Array<TypeImageURLS>>([]);
+const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, imageURLS, setImageURLs }) => {
+  const imgRef = useRef<HTMLImageElement>(null);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<TypeImageURLS>>([]);
   const [crop, setCrop] = useState<Crop>();
-  const imgRef = useRef<HTMLImageElement>(null);
 
   async function handleCompletedCrop(pixelCrop: PixelCrop, id: number) {
+    console.log(pixelCrop, id);
     const image = imgRef.current;
     if (!image || pixelCrop.width === 0) {
       return;
