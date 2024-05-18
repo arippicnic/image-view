@@ -14,7 +14,7 @@ import { IoIosCut } from "react-icons/io";
 import { FaGear } from "react-icons/fa6";
 
 import { niceBytes } from "../src/helper/niceBytes";
-import { imageType } from "../src/helper/imageType";
+import { imageType, imageTypeSvg } from "../src/helper/imageType";
 import ModalForm from "./components/modalForm";
 import CropImg from "./components/cropImg";
 import { TypeFormData, TypeImageURLS } from "../src/types";
@@ -47,31 +47,48 @@ export default function Home() {
     const extractedFiles = acceptedFiles.filter((el: { type: string }) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: { type: string }) => el.type === "application/zip");
     const newFiles: File[] = [...extractedFiles];
+    const legthFile = newFiles.filter((el: { type: string }) => el.type !== "image/svg+xml");
+    const legthFileSvg = newFiles.filter((el: { type: string }) => el.type === "image/svg+xml");
     let completedCount = 0;
     let index = 1;
+    let fileImages: Blob | undefined = undefined;
 
     if (extractedFilesZip.length !== 0) {
       for (const image of extractedFilesZip) {
         const zip = new JSZip();
         const zipFile = await zip.loadAsync(image);
-
+        console.log(zipFile);
         await Promise.all(
-          Object.keys(zipFile.files).map(async (relativePath) => {
-            const zipEntry = zipFile.files[relativePath];
-            if (!zipEntry.dir) {
-              if (imageType(zipEntry.name)) {
-                const blob = await zipEntry.async("blob");
-                const file = new File([blob], zipEntry.name, { type: "image/png" });
-                newFiles.push(file);
+          Object.keys(zipFile.files)
+            .filter((key) => !key.match(/^__MACOSX\//))
+            .map(async (relativePath) => {
+              const zipEntry = zipFile.files[relativePath];
+              if (!zipEntry.dir) {
+                if (imageType(zipEntry.name)) {
+                  const blob = await zipEntry.async("blob");
+                  if (imageTypeSvg(zipEntry.name)) {
+                    const file = new File([blob], "file", { type: "image/svg+xml" });
+                    newFiles.push(file);
+                  } else {
+                    const file = new File([blob], "file", { type: "image/png" });
+                    newFiles.push(file);
+                  }
+                }
               }
-            }
-          })
+            })
         );
       }
     }
 
     for (const image of newFiles) {
-      const fileImages: Blob | undefined = await compression(image, newFiles.length, completedCount, option, setpecentOF);
+      if (option.fileType === "original" && image.type === "image/svg+xml") {
+        const progressPercent = 100 / legthFileSvg.length + completedCount;
+        const digitsOnly = parseInt(progressPercent.toString(), 10);
+        setpecentOF(digitsOnly);
+        fileImages = new Blob([image], { type: image.type  });
+      } else {
+        fileImages = await compression(image, legthFile.length, completedCount, option, setpecentOF);
+      }
       if (fileImages) {
         let name = image.name;
         let name_full = name;
@@ -133,8 +150,8 @@ export default function Home() {
           <input {...getInputProps()} />
           {isDragActive ? <p>Drop</p> : <p>Drag or click</p>}
         </div>
-        {pecentOF !== 0 && ![99, 100].includes(pecentOF) && <h2 className="mt-4">{pecentOF}%</h2>}
-        {[99, 100].includes(pecentOF) && imageURLS.length !== 0 && (
+        {pecentOF !== 0 && pecentOF < 99 && <h2 className="mt-4">{pecentOF}%</h2>}
+        {pecentOF > 99 && imageURLS.length !== 0 && (
           <>
             <div className="flex my-4">
               <button onClick={() => setImageURLs([])} className="mr-2 bg-red-500 text-white font-bold py-2 px-4">
