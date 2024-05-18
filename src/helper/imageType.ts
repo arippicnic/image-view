@@ -1,10 +1,10 @@
-export function imageType(input: string): boolean {
+export function imageType(input: string): boolean | string {
   const lastDotIndex = input.lastIndexOf(".");
 
   if (lastDotIndex !== -1) {
     const lastText = input.substring(lastDotIndex + 1);
     if (["jpg", "jpeg", "png", "svg", "webp"].includes(lastText)) {
-      return true;
+      return lastText;
     }
     return false;
   }

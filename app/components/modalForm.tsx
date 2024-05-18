@@ -37,7 +37,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
         name: "fileType",
         type: "select",
         col: "col-span-2",
-        selectData: ["png", "webp", "jpg", "original"],
+        selectData: ["png", "webp", "jpg", "with-svg", "original"],
       },
       { label: "Auto Crop PNG", name: "autoCrop", type: "select", col: "col-span-2", selectData: ["yes", "no"] },
       { label: "Code Image", name: "codeOuput", type: "textArea", col: "col-span-8" },

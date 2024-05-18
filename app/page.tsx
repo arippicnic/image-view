@@ -81,7 +81,8 @@ export default function Home() {
     }
 
     for (const image of newFiles) {
-      if (option.fileType === "original" && image.type === "image/svg+xml") {
+      console.log(image)
+      if (["with-svg", "original"].includes(option.fileType) && image.type === "image/svg+xml") {
         const progressPercent = 100 / legthFileSvg.length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
         setpecentOF(digitsOnly);
@@ -95,9 +96,10 @@ export default function Home() {
         let alt = `alt="image ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
 
         if (option.fileType !== "original") {
-          name = (Number(option.nameStart) + Number(index) - 1).toString();
-          name_full = `img_${stringToSlug(option.namePage)}-${name}.${option.fileType}`;
-          alt = `alt="image ${option.fileType} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+          const typeFIle = imageType(image.name);
+          name = `${(Number(option.nameStart) + Number(index) - 1).toString()}.${typeFIle}`;
+          name_full = `img_${stringToSlug(option.namePage)}-${name}.${typeFIle}`;
+          alt = `alt="image ${typeFIle} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
         }
 
         const replacements = { "{name}": name_full, "{alt}": alt };
