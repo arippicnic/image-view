@@ -81,7 +81,6 @@ export default function Home() {
     }
 
     for (const image of newFiles) {
-      console.log(image)
       if (["with-svg", "original"].includes(option.fileType) && image.type === "image/svg+xml") {
         const progressPercent = 100 / legthFileSvg.length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
