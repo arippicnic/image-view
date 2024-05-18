@@ -47,8 +47,6 @@ export default function Home() {
     const extractedFiles = acceptedFiles.filter((el: { type: string }) => el.type !== "application/zip");
     const extractedFilesZip = acceptedFiles.filter((el: { type: string }) => el.type === "application/zip");
     const newFiles: File[] = [...extractedFiles];
-    const legthFile = newFiles.filter((el: { type: string }) => el.type !== "image/svg+xml");
-    const legthFileSvg = newFiles.filter((el: { type: string }) => el.type === "image/svg+xml");
     let completedCount = 0;
     let index = 1;
     let fileImages: Blob | undefined = undefined;
@@ -82,12 +80,12 @@ export default function Home() {
 
     for (const image of newFiles) {
       if (["with-svg", "original"].includes(option.fileType) && image.type === "image/svg+xml") {
-        const progressPercent = 100 / legthFileSvg.length + completedCount;
+        const progressPercent = 100 / newFiles.length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
         setpecentOF(digitsOnly);
         fileImages = new Blob([image], { type: image.type  });
       } else {
-        fileImages = await compression(image, legthFile.length, completedCount, option, setpecentOF);
+        fileImages = await compression(image, newFiles.length, completedCount, option, setpecentOF);
       }
       if (fileImages) {
         let name = image.name;
