@@ -83,7 +83,7 @@ export default function Home() {
         const progressPercent = 100 / newFiles.length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
         setpecentOF(digitsOnly);
-        fileImages = new Blob([image], { type: image.type  });
+        fileImages = new Blob([image], { type: image.type });
       } else {
         fileImages = await compression(image, newFiles.length, completedCount, option, setpecentOF);
       }
@@ -93,9 +93,9 @@ export default function Home() {
         let alt = `alt="image ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
 
         if (option.fileType !== "original") {
-          const typeFIle = option.fileType === "with-svg" ? imageType(image.name): option.fileType;
+          const typeFIle = option.fileType === "with-svg" ? imageType(image.name) : option.fileType;
           name = `${(Number(option.nameStart) + Number(index) - 1).toString()}.${typeFIle}`;
-          name_full = `img_${stringToSlug(option.namePage)}-${name}.${typeFIle}`;
+          name_full = `img_${stringToSlug(option.namePage)}-${name}`;
           alt = `alt="image ${typeFIle} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
         }
 
