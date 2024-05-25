@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import JSZip from "jszip";
 import { Tooltip } from "react-tooltip";
@@ -14,6 +14,7 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
 import { FaGear } from "react-icons/fa6";
 import { HiOutlineSaveAs } from "react-icons/hi";
+import { FaUndo } from "react-icons/fa";
 
 import { niceBytes } from "../src/helper/niceBytes";
 import { imageType, imageTypeSvg } from "../src/helper/imageType";
@@ -31,6 +32,7 @@ export default function Home() {
   const [imageViewCrop, setImageCrop] = useState<{ url: string; id: number } | null>(null);
   const [pecentOF, setpecentOF] = useState(0);
   const [copyCode, setCopyCode] = useState(0);
+  const [undo, setUndo] = useState(false);
   const [optionModal, setOptionModal] = useState(false);
   const [donwloadImage, setDonwloadImage] = useState(0);
   const [imageView, setImageView] = useState<string | null>(null);
@@ -107,7 +109,17 @@ export default function Home() {
         const size = niceBytes(fileImages.size);
         const id = index + new Date().valueOf();
         const img = URL.createObjectURL(fileImages);
-        newImageUrls.push({ id, img, size, name, name_full, codeImg, fileType: option.fileType });
+        newImageUrls.push({
+          id,
+          img,
+          imgOriginal: img,
+          size,
+          name,
+          name_full,
+          codeImg,
+          fileType: option.fileType,
+          type: imageType(image.name),
+        });
         completedCount = 100 / newFiles.length + completedCount;
       }
       index++;
@@ -123,6 +135,16 @@ export default function Home() {
     },
   });
 
+  useEffect(() => {
+    if (imageURLS.length !== 0) {
+      const alertUser = (e: BeforeUnloadEvent) => e.preventDefault();
+      window.addEventListener("beforeunload", alertUser);
+      return () => {
+        window.removeEventListener("beforeunload", alertUser);
+      };
+    }
+  }, [imageURLS]);
+
   return (
     <>
       <ModalForm option={option} setOption={setOption} modal={optionModal} setModal={setOptionModal} />
@@ -132,6 +154,7 @@ export default function Home() {
         setImageCrop={setImageCrop}
         imageURLS={imageURLS}
         setImageURLs={setImageURLs}
+        setUndo={setUndo}
       />
       {imageView && (
         <div className="img-view-box">
@@ -157,7 +180,15 @@ export default function Home() {
         {pecentOF > 99 && imageURLS.length !== 0 && (
           <>
             <div className="flex my-4">
-              <button onClick={() => setImageURLs([])} className="mr-2 bg-red-500 text-white font-bold py-2 px-4">
+              <button
+                onClick={() => {
+                  const answer = window.confirm("Are you sure you want to delete All Images");
+                  if (answer) {
+                    setImageURLs([]);
+                  }
+                }}
+                className="mr-2 bg-red-500 text-white font-bold py-2 px-4"
+              >
                 Delete All
               </button>
               <button onClick={() => downloadMulti(imageURLS)} className="bg-blue-500 text-white font-bold py-2 px-4">
@@ -179,7 +210,7 @@ export default function Home() {
                         data-tooltip-id="tooltip-see"
                         data-tooltip-content="See"
                         onClick={() => setImageView(items.img)}
-                        className="icon"
+                        className="text-[1.7rem]"
                       />
                     </div>
                     <div className="cursor-pointer ml-3">
@@ -216,17 +247,34 @@ export default function Home() {
                         />
                       </div>
                     )}
-                    <div className="cursor-pointer ml-3">
-                      <Tooltip id="tooltip-crop" />
-                      <IoIosCut
-                        data-tooltip-id="tooltip-crop"
-                        data-tooltip-content="Crop"
-                        onClick={() => {
-                          setImageCrop({ url: items.img, id: items.id });
-                        }}
-                        className="text-[1.7rem]"
-                      />
-                    </div>
+                    {items.type !== "svg" && (
+                      <div className="cursor-pointer ml-3">
+                        <Tooltip id="tooltip-crop" />
+                        <IoIosCut
+                          data-tooltip-id="tooltip-crop"
+                          data-tooltip-content="Crop"
+                          onClick={() => {
+                            setImageCrop({ url: items.img, id: items.id });
+                          }}
+                          className="text-[1.7rem]"
+                        />
+                      </div>
+                    )}
+                    {undo && (
+                      <div className="cursor-pointer ml-3">
+                        <Tooltip id="tooltip-undo" />
+                        <FaUndo
+                          data-tooltip-id="tooltip-undo"
+                          data-tooltip-content="Undo"
+                          onClick={() => {
+                            const newProjects = imageURLS.map((p) => (p.id === items.id ? { ...p, img: items.imgOriginal } : p));
+                            setImageURLs(newProjects);
+                            setUndo(false);
+                          }}
+                          className="text-[1.2rem]"
+                        />
+                      </div>
+                    )}
                     <div className="cursor-pointer ml-3">
                       {copyCode === items.id ? (
                         <FaCheck color="green" className="icon" />
@@ -254,11 +302,14 @@ export default function Home() {
                         data-tooltip-id="tooltip-delete"
                         data-tooltip-content="Delete"
                         onClick={() => {
-                          setImageURLs(
-                            imageURLS.filter(function (el) {
-                              return el.id !== items.id;
-                            })
-                          );
+                          const answer = window.confirm("Are you sure you want to delete Image");
+                          if (answer) {
+                            setImageURLs(
+                              imageURLS.filter(function (el) {
+                                return el.id !== items.id;
+                              })
+                            );
+                          }
                         }}
                         className="text-[1.7rem]"
                       />

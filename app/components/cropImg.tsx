@@ -14,9 +14,10 @@ interface TypeCom {
   setImageCrop: Dispatch<SetStateAction<{ url: string; id: number } | null>>;
   imageURLS: TypeImageURLS[];
   setImageURLs: Dispatch<SetStateAction<TypeImageURLS[]>>;
+  setUndo: Dispatch<SetStateAction<boolean>>;
 }
 
-const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, imageURLS, setImageURLs }) => {
+const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, imageURLS, setImageURLs, setUndo }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<TypeImageURLS>>([]);
   const [crop, setCrop] = useState<Crop>();
@@ -38,7 +39,7 @@ const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, image
           const newProjects = imageURLS.map((p) => (p.id === id ? { ...p, img, size } : p));
           setImageURLsCrop(newProjects);
         }
-      }, `image/${option.fileType}`);
+      }, `image/png`);
     });
   }
 
@@ -56,6 +57,7 @@ const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, image
               onClick={() => {
                 setImageURLs(imageURLSCrop);
                 setImageCrop(null);
+                setUndo(true);
               }}
             />
             <IoIosCloseCircle color="black" className="item !mr-0" onClick={() => setImageCrop(null)} />

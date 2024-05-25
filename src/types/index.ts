@@ -14,8 +14,10 @@ export type TypeFormData = {
 export type TypeImageURLS = {
   id: number;
   img: string;
+  imgOriginal: string;
   name: string;
   codeImg: string;
   size: string;
   name_full: string;
+  type: string | boolean;
 } & FileType;
