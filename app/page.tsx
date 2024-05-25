@@ -234,7 +234,7 @@ export default function Home() {
                         </>
                       )}
                     </div>
-                    {items.fileType === "original" && (
+                    {items.fileType === "original" && items.type !== "svg" && (
                       <div className="cursor-pointer ml-3">
                         <Tooltip id="tooltip-save" />
                         <HiOutlineSaveAs
