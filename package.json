@@ -17,6 +17,7 @@
     "react-dropzone": "^14.2.3",
     "react-icons": "^4.12.0",
     "react-image-crop": "^10.1.8",
+    "react-tooltip": "^5.26.4",
     "sass": "^1.69.5"
   },
   "devDependencies": {

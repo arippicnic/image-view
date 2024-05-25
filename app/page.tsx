@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import JSZip from "jszip";
+import { Tooltip } from "react-tooltip";
 
 import { FaCheck } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
@@ -142,7 +143,8 @@ export default function Home() {
       )}
       <main className="flex justify-center flex-col items-center">
         <div className="my-4 cursor-pointer" onClick={() => setOptionModal(true)}>
-          <FaGear color="white" className="icon" />
+          <Tooltip id="tooltip-setting" place="bottom" />
+          <FaGear data-tooltip-id="tooltip-setting" data-tooltip-content="Setting" color="white" className="icon" />
         </div>
         <div
           {...getRootProps()}
@@ -172,27 +174,41 @@ export default function Home() {
                   <p>Size: {items.size}</p>
                   <div className="flex mt-3 items-center">
                     <div className="cursor-pointer">
-                      <IoEyeOutline onClick={() => setImageView(items.img)} className="icon" />
+                      <Tooltip id="tooltip-see" />
+                      <IoEyeOutline
+                        data-tooltip-id="tooltip-see"
+                        data-tooltip-content="See"
+                        onClick={() => setImageView(items.img)}
+                        className="icon"
+                      />
                     </div>
                     <div className="cursor-pointer ml-3">
                       {donwloadImage === items.id ? (
                         <FaCheck color="green" className="icon" />
                       ) : (
-                        <FiDownload
-                          className="icon"
-                          onClick={() => {
-                            setDonwloadImage(items.id);
-                            downloadMulti([{ ...items }]);
-                            setTimeout(() => {
-                              setDonwloadImage(0);
-                            }, 500);
-                          }}
-                        />
+                        <>
+                          <Tooltip id="tooltip-donwload" />
+                          <FiDownload
+                            data-tooltip-id="tooltip-donwload"
+                            data-tooltip-content="Donwload"
+                            className="icon"
+                            onClick={() => {
+                              setDonwloadImage(items.id);
+                              downloadMulti([{ ...items }]);
+                              setTimeout(() => {
+                                setDonwloadImage(0);
+                              }, 500);
+                            }}
+                          />
+                        </>
                       )}
                     </div>
                     {items.fileType === "original" && (
                       <div className="cursor-pointer ml-3">
+                        <Tooltip id="tooltip-save" />
                         <HiOutlineSaveAs
+                          data-tooltip-id="tooltip-save"
+                          data-tooltip-content="Save"
                           onClick={() => {
                             saveImage(items.img, items.name_full);
                           }}
@@ -201,7 +217,10 @@ export default function Home() {
                       </div>
                     )}
                     <div className="cursor-pointer ml-3">
+                      <Tooltip id="tooltip-crop" />
                       <IoIosCut
+                        data-tooltip-id="tooltip-crop"
+                        data-tooltip-content="Crop"
                         onClick={() => {
                           setImageCrop({ url: items.img, id: items.id });
                         }}
@@ -212,20 +231,28 @@ export default function Home() {
                       {copyCode === items.id ? (
                         <FaCheck color="green" className="icon" />
                       ) : (
-                        <IoCopyOutline
-                          className="icon"
-                          onClick={() => {
-                            navigator.clipboard.writeText(items.codeImg);
-                            setCopyCode(items.id);
-                            setTimeout(() => {
-                              setCopyCode(0);
-                            }, 500);
-                          }}
-                        />
+                        <>
+                          <Tooltip id="tooltip-copyCode" />
+                          <IoCopyOutline
+                            data-tooltip-id="tooltip-copyCode"
+                            data-tooltip-content="Copy Code"
+                            className="icon"
+                            onClick={() => {
+                              navigator.clipboard.writeText(items.codeImg);
+                              setCopyCode(items.id);
+                              setTimeout(() => {
+                                setCopyCode(0);
+                              }, 500);
+                            }}
+                          />
+                        </>
                       )}
                     </div>
                     <div className="cursor-pointer ml-3">
+                      <Tooltip id="tooltip-delete" />
                       <RiDeleteBin7Line
+                        data-tooltip-id="tooltip-delete"
+                        data-tooltip-content="Delete"
                         onClick={() => {
                           setImageURLs(
                             imageURLS.filter(function (el) {
