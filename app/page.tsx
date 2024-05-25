@@ -92,6 +92,7 @@ export default function Home() {
       } else {
         fileImages = await compression(image, newFiles.length, completedCount, option, setpecentOF);
       }
+
       if (fileImages) {
         let name = image.name;
         let name_full = name;
@@ -118,7 +119,7 @@ export default function Home() {
           name_full,
           codeImg,
           fileType: option.fileType,
-          type: imageType(image.name),
+          type: imageType(name),
         });
         completedCount = 100 / newFiles.length + completedCount;
       }
