@@ -12,6 +12,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoIosCut } from "react-icons/io";
 import { FaGear } from "react-icons/fa6";
+import { HiOutlineSaveAs } from "react-icons/hi";
 
 import { niceBytes } from "../src/helper/niceBytes";
 import { imageType, imageTypeSvg } from "../src/helper/imageType";
@@ -21,6 +22,7 @@ import { TypeFormData, TypeImageURLS } from "../src/types";
 import { stringToSlug } from "../src/helper/stringToSlug";
 import { replaceSpecialString } from "../src/helper/replaceSpecialString";
 import { downloadMulti } from "../src/helper/donwloadMulti";
+import { saveImage } from "@/src/helper/saveImage";
 import { compression } from "../src/helper/compress";
 
 export default function Home() {
@@ -104,7 +106,7 @@ export default function Home() {
         const size = niceBytes(fileImages.size);
         const id = index + new Date().valueOf();
         const img = URL.createObjectURL(fileImages);
-        newImageUrls.push({ id, img, size, name, name_full, codeImg });
+        newImageUrls.push({ id, img, size, name, name_full, codeImg, fileType: option.fileType });
         completedCount = 100 / newFiles.length + completedCount;
       }
       index++;
@@ -188,6 +190,16 @@ export default function Home() {
                         />
                       )}
                     </div>
+                    {items.fileType === "original" && (
+                      <div className="cursor-pointer ml-3">
+                        <HiOutlineSaveAs
+                          onClick={() => {
+                            saveImage(items.img, items.name_full);
+                          }}
+                          className="text-[1.7rem]"
+                        />
+                      </div>
+                    )}
                     <div className="cursor-pointer ml-3">
                       <IoIosCut
                         onClick={() => {

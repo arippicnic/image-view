@@ -1,12 +1,15 @@
+type FileType = {
+  fileType: "png" | "webp" | "jpg" | "with-svg" | "original";
+};
+
 export type TypeFormData = {
   nameApp: string;
   namePage: string;
   fileMaxSize: number;
   nameStart: number;
-  fileType: string;
   autoCrop: "yes" | "no";
   codeOuput: string;
-};
+} & FileType;
 
 export type TypeImageURLS = {
   id: number;
@@ -15,4 +18,4 @@ export type TypeImageURLS = {
   codeImg: string;
   size: string;
   name_full: string;
-};
+} & FileType;
