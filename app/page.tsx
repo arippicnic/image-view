@@ -36,11 +36,11 @@ export default function Home() {
   const [optionModal, setOptionModal] = useState(false);
   const [donwloadImage, setDonwloadImage] = useState(0);
   const [imageView, setImageView] = useState<string | null>(null);
-
+  const [indexCount, setIndexCount] = useState(1);
   const [option, setOption] = useState<TypeFormData>({
     nameStart: 1,
     fileType: "webp",
-    fileMaxSize: 0.2,
+    fileMaxSize: 100,
     nameApp: "name",
     namePage: "page",
     codeOuput: `<img src="/{name}" {alt} />`,
@@ -84,6 +84,7 @@ export default function Home() {
     }
 
     for (const image of newFiles) {
+      console.log(image);
       if (["with-svg", "original"].includes(option.fileType) && image.type === "image/svg+xml") {
         const progressPercent = 100 / newFiles.length + completedCount;
         const digitsOnly = parseInt(progressPercent.toString(), 10);
@@ -110,6 +111,7 @@ export default function Home() {
         const size = niceBytes(fileImages.size);
         const id = index + new Date().valueOf();
         const img = URL.createObjectURL(fileImages);
+        console.log(name);
         newImageUrls.push({
           id,
           img,
@@ -126,6 +128,7 @@ export default function Home() {
       index++;
     }
     setImageURLs(newImageUrls);
+    setOption({ ...option, nameStart: imageURLS.length !== 0 ? option.nameStart + Number(index) - 1 : index });
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

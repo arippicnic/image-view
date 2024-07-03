@@ -12,7 +12,7 @@ export async function compression(
   setpecentOF: Dispatch<SetStateAction<number>>
 ) {
   const options = {
-    maxSizeMB: option.fileMaxSize,
+    maxSizeMB: option.fileMaxSize / 1000,
     alwaysKeepResolution: true,
     fileType: `image/webp`,
     onProgress: (i: number) => {

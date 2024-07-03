@@ -16,9 +16,15 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    let valSend = value;
+    let valSend: string | number = value;
     if (typeof value === "string") {
       valSend = value.replace(/ {2,}/g, " ");
+    }
+    if (name === "fileMaxSize") {
+      const { min, max } = e.target as HTMLInputElement;
+      if (valSend < min || valSend > max) {
+        valSend = Math.max(Number(min), Math.min(Number(max), Number(value)));
+      }
     }
     setFormData((prevData) => ({
       ...prevData,
@@ -30,7 +36,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
     return [
       { label: "Name", name: "nameApp", type: "text", col: "col-span-4" },
       { label: "Name Page", name: "namePage", type: "text", col: "col-span-4" },
-      { label: "Max Size(MB)", name: "fileMaxSize", type: "number", col: "col-span-2" },
+      { label: "Max Size (KiB)", name: "fileMaxSize", type: "number", col: "col-span-2" },
       { label: "Start Name", name: "nameStart", type: "number", col: "col-span-2" },
       {
         label: "Output Image",
@@ -66,10 +72,21 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
             ))}
           </select>
         )}
-        {["text", "number"].includes(item.type) && (
+        {["text", "number"].includes(item.type) && item.name !== "fileMaxSize" && (
           <input
             type={item.type}
             name={item.name}
+            className="text-gray-900 p-2 w-full"
+            value={formData[item.name as keyof TypeFormData]}
+            onChange={handleInputChange}
+          />
+        )}
+        {item.name === "fileMaxSize" && (
+          <input
+            type="number"
+            name={item.name}
+            min="1"
+            max="1000"
             className="text-gray-900 p-2 w-full"
             value={formData[item.name as keyof TypeFormData]}
             onChange={handleInputChange}
