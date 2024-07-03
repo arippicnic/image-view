@@ -36,7 +36,6 @@ export default function Home() {
   const [optionModal, setOptionModal] = useState(false);
   const [donwloadImage, setDonwloadImage] = useState(0);
   const [imageView, setImageView] = useState<string | null>(null);
-  const [indexCount, setIndexCount] = useState(1);
   const [option, setOption] = useState<TypeFormData>({
     nameStart: 1,
     fileType: "webp",
