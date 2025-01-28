@@ -31,19 +31,14 @@ export default function Home() {
   const [imageURLS, setImageURLs] = useState<Array<TypeImageURLS>>([]);
   const [imageViewCrop, setImageCrop] = useState<{ url: string; id: number } | null>(null);
   const [pecentOF, setpecentOF] = useState(0);
-  const [copyCode, setCopyCode] = useState(0);
+
   const [undo, setUndo] = useState(false);
   const [optionModal, setOptionModal] = useState(false);
   const [donwloadImage, setDonwloadImage] = useState(0);
   const [imageView, setImageView] = useState<string | null>(null);
   const [option, setOption] = useState<TypeFormData>({
-    nameStart: 1,
     fileType: "webp",
-    fileMaxSize: 100,
-    nameApp: "name",
-    namePage: "page",
-    codeOuput: `<img src="/{name}" {alt} />`,
-    autoCrop: "yes",
+    autoCrop: "no",
   });
 
   const onImageChange = (file: TypeImageURLS[]) => async (acceptedFiles: File[]) => {
@@ -59,7 +54,7 @@ export default function Home() {
       for (const image of extractedFilesZip) {
         const zip = new JSZip();
         const zipFile = await zip.loadAsync(image);
-        console.log(zipFile);
+
         await Promise.all(
           Object.keys(zipFile.files)
             .filter((key) => !key.match(/^__MACOSX\//))
@@ -83,34 +78,16 @@ export default function Home() {
     }
 
     for (const image of newFiles) {
-      console.log(image);
-      if (["with-svg", "original"].includes(option.fileType) && image.type === "image/svg+xml") {
-        const progressPercent = 100 / newFiles.length + completedCount;
-        const digitsOnly = parseInt(progressPercent.toString(), 10);
-        setpecentOF(digitsOnly);
-        fileImages = new Blob([image], { type: image.type });
-      } else {
-        fileImages = await compression(image, newFiles.length, completedCount, option, setpecentOF);
-      }
-
+      fileImages = await compression(image, newFiles.length, completedCount, option, setpecentOF, option.fileType);
       if (fileImages) {
-        let name = image.name;
-        let name_full = name;
-        let alt = `alt="image ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
+        const typeFIle = option.fileType;
+        const name = ``;
+        const name_full = ``;
 
-        if (option.fileType !== "original") {
-          const typeFIle = option.fileType === "with-svg" ? imageType(image.name) : option.fileType;
-          name = `${(Number(option.nameStart) + Number(index) - 1).toString()}.${typeFIle}`;
-          name_full = `img_${stringToSlug(option.namePage)}-${name}`;
-          alt = `alt="image ${typeFIle} ${option.namePage.toLocaleLowerCase()} ${option.nameApp}"`;
-        }
-
-        const replacements = { "{name}": name_full, "{alt}": alt };
-        const codeImg = replaceSpecialString(option.codeOuput, replacements);
         const size = niceBytes(fileImages.size);
         const id = index + new Date().valueOf();
         const img = URL.createObjectURL(fileImages);
-        console.log(name);
+
         newImageUrls.push({
           id,
           img,
@@ -118,16 +95,21 @@ export default function Home() {
           size,
           name,
           name_full,
-          codeImg,
-          fileType: option.fileType,
-          type: imageType(name),
+          type: typeFIle,
         });
         completedCount = 100 / newFiles.length + completedCount;
       }
       index++;
     }
-    setImageURLs(newImageUrls);
-    setOption({ ...option, nameStart: imageURLS.length !== 0 ? option.nameStart + Number(index) - 1 : index });
+
+    const newImageUrlsSend = newImageUrls.map((obj, i) => ({
+      ...obj,
+      name: `${i + 1}.${obj.type}`,
+      name_full: `img_min-${i + 1}.${obj.type}`,
+    }));
+
+    setImageURLs(newImageUrlsSend);
+    setOption({ ...option });
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -208,15 +190,6 @@ export default function Home() {
                   <p>Size: {items.size}</p>
                   <div className="flex mt-3 items-center">
                     <div className="cursor-pointer">
-                      <Tooltip id="tooltip-see" />
-                      <IoEyeOutline
-                        data-tooltip-id="tooltip-see"
-                        data-tooltip-content="See"
-                        onClick={() => setImageView(items.img)}
-                        className="text-[1.7rem]"
-                      />
-                    </div>
-                    <div className="cursor-pointer ml-3">
                       {donwloadImage === items.id ? (
                         <FaCheck color="green" className="icon" />
                       ) : (
@@ -237,32 +210,17 @@ export default function Home() {
                         </>
                       )}
                     </div>
-                    {items.fileType === "original" && items.type !== "svg" && (
-                      <div className="cursor-pointer ml-3">
-                        <Tooltip id="tooltip-save" />
-                        <HiOutlineSaveAs
-                          data-tooltip-id="tooltip-save"
-                          data-tooltip-content="Save"
-                          onClick={() => {
-                            saveImage(items.img, items.name_full);
-                          }}
-                          className="text-[1.7rem]"
-                        />
-                      </div>
-                    )}
-                    {items.type !== "svg" && (
-                      <div className="cursor-pointer ml-3">
-                        <Tooltip id="tooltip-crop" />
-                        <IoIosCut
-                          data-tooltip-id="tooltip-crop"
-                          data-tooltip-content="Crop"
-                          onClick={() => {
-                            setImageCrop({ url: items.img, id: items.id });
-                          }}
-                          className="text-[1.7rem]"
-                        />
-                      </div>
-                    )}
+                    <div className="cursor-pointer ml-3">
+                      <Tooltip id="tooltip-crop" />
+                      <IoIosCut
+                        data-tooltip-id="tooltip-crop"
+                        data-tooltip-content="Crop"
+                        onClick={() => {
+                          setImageCrop({ url: items.img, id: items.id });
+                        }}
+                        className="text-[1.7rem]"
+                      />
+                    </div>
                     {undo && (
                       <div className="cursor-pointer ml-3">
                         <Tooltip id="tooltip-undo" />
@@ -278,27 +236,6 @@ export default function Home() {
                         />
                       </div>
                     )}
-                    <div className="cursor-pointer ml-3">
-                      {copyCode === items.id ? (
-                        <FaCheck color="green" className="icon" />
-                      ) : (
-                        <>
-                          <Tooltip id="tooltip-copyCode" />
-                          <IoCopyOutline
-                            data-tooltip-id="tooltip-copyCode"
-                            data-tooltip-content="Copy Code"
-                            className="icon"
-                            onClick={() => {
-                              navigator.clipboard.writeText(items.codeImg);
-                              setCopyCode(items.id);
-                              setTimeout(() => {
-                                setCopyCode(0);
-                              }, 500);
-                            }}
-                          />
-                        </>
-                      )}
-                    </div>
                     <div className="cursor-pointer ml-3">
                       <Tooltip id="tooltip-delete" />
                       <RiDeleteBin7Line

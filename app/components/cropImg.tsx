@@ -17,7 +17,7 @@ interface TypeCom {
   setUndo: Dispatch<SetStateAction<boolean>>;
 }
 
-const CropImg: React.FC<TypeCom> = ({ option, imageViewCrop, setImageCrop, imageURLS, setImageURLs, setUndo }) => {
+const CropImg: React.FC<TypeCom> = ({ imageViewCrop, setImageCrop, imageURLS, setImageURLs, setUndo }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [imageURLSCrop, setImageURLsCrop] = useState<Array<TypeImageURLS>>([]);
   const [crop, setCrop] = useState<Crop>();

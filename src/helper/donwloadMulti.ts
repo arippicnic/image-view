@@ -26,6 +26,6 @@ export function downloadMulti(event: TypeImageURLS[]) {
         .catch((err) => {
           console.log(err);
         });
-    }, idx * 100);
+    }, idx * 200);
   });
 }

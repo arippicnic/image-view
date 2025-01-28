@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { TypeFormData } from "../types";
+import { TypeFormData, TypeFile } from "../types";
 import { removeTransparentPixelsFromFile } from "./removeTransparentPixelsFromFile";
 import imageCompression from "browser-image-compression";
 
@@ -9,12 +9,14 @@ export async function compression(
   length: number,
   completedCount: number,
   option: TypeFormData,
-  setpecentOF: Dispatch<SetStateAction<number>>
+  setpecentOF: Dispatch<SetStateAction<number>>,
+  typeOf: string
 ) {
   const options = {
-    maxSizeMB: option.fileMaxSize / 1000,
-    alwaysKeepResolution: true,
-    fileType: `image/webp`,
+    maxSizeMB: 0.2,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    fileType: `image/${typeOf}`,
     onProgress: (i: number) => {
       const progressPercent = i / length + completedCount;
       const digitsOnly = parseInt(progressPercent.toString(), 10);

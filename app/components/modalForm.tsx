@@ -34,19 +34,14 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
 
   const renderField = () => {
     return [
-      { label: "Name", name: "nameApp", type: "text", col: "col-span-4" },
-      { label: "Name Page", name: "namePage", type: "text", col: "col-span-4" },
-      { label: "Max Size (KiB)", name: "fileMaxSize", type: "number", col: "col-span-2" },
-      { label: "Start Name", name: "nameStart", type: "number", col: "col-span-2" },
       {
         label: "Output Image",
         name: "fileType",
         type: "select",
         col: "col-span-2",
-        selectData: ["png", "webp", "jpg", "with-svg", "original"],
+        selectData: ["png", "webp", "jpeg"],
       },
       { label: "Auto Crop PNG", name: "autoCrop", type: "select", col: "col-span-2", selectData: ["yes", "no"] },
-      { label: "Code Image", name: "codeOuput", type: "textArea", col: "col-span-8" },
     ].map((item, i) => (
       <div key={i} className={`${item.col} w-full`}>
         <label className="block mb-1 text-xs">{item.label}</label>
@@ -108,7 +103,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
     <>
       {modal && (
         <div className={`fixed top-0 right-0 left-0 z-50 justify-center max-h-full flex items-start`}>
-          <div className="relative p-4 w-full max-w-3xl max-h-full">
+          <div className="relative p-4 w-full max-w-md max-h-full">
             <div className="relative dark:bg-gray-700 p-4">
               <IoIosCloseCircle
                 onClick={() => setModal(false)}
@@ -116,7 +111,7 @@ const ModalForm: React.FC<TypeCom> = ({ option, setOption, modal, setModal }) =>
                 className="cursor-pointer absolute right-[1rem] text-[1.7rem] item "
               />
               <form className="text-sm mt-10">
-                <div className="grid grid-cols-8 gap-2 mb-5">{renderField()}</div>
+                <div className="grid grid-cols-4 gap-2 mb-5">{renderField()}</div>
                 <div className="flex justify-end w-full">
                   <button
                     onClick={(e) => {
