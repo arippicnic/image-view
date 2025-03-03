@@ -14,7 +14,7 @@ export async function compression(
 ) {
   const options = {
     maxSizeMB: 0.2,
-    maxWidthOrHeight: 3840,
+    maxWidthOrHeight: 5000,
     useWebWorker: true,
     fileType: `image/${typeOf}`,
     onProgress: (i: number) => {
