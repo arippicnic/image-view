@@ -13,7 +13,7 @@ export async function compression(
   typeOf: string
 ) {
   const options = {
-    maxSizeMB: 0.2,
+    maxSizeMB: 0.1,
     maxWidthOrHeight: 5000,
     useWebWorker: true,
     fileType: `image/${typeOf}`,
