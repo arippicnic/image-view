@@ -14,8 +14,8 @@ export async function compression(
 ) {
   const options = {
     maxSizeMB: 0.1,
-    maxWidthOrHeight: 5000,
     useWebWorker: true,
+    alwaysKeepResolution: true,
     fileType: `image/${typeOf}`,
     onProgress: (i: number) => {
       const progressPercent = i / length + completedCount;
